@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B1 English Short Stories - Typewriter Reader</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #0ea5e9;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --success: #16a34a;
+      --warn: #f59e0b;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+      border: 1px solid var(--border-color);
+      padding: 28px;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      background-color: #dbeafe;
+      color: #1e40af;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      background: #f1f5f9;
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    select, button {
+      font-size: 0.95rem;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    select:focus, button:focus {
+      outline: 2px solid var(--primary);
+    }
+
+    button:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    button.btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    button.btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .speed-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .story-card {
+      min-height: 190px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 24px;
+      position: relative;
+      margin-bottom: 24px;
+      line-height: 1.75;
+      font-size: 1.15rem;
+      color: #334155;
+    }
+
+    .story-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background-color: var(--primary);
+      vertical-align: middle;
+      animation: blink 0.8s infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .word-counter {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      position: absolute;
+      top: 16px;
+      right: 18px;
+    }
+
+    .interactive-section {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      display: none;
+    }
+
+    .question-box {
+      margin-bottom: 16px;
+    }
+
+    .question-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .timer-container {
+      margin: 16px 0;
+    }
+
+    .timer-bar-bg {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      background: var(--warn);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .timer-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .answer-box {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-color);
+      display: none;
+    }
+
+    .answer-title {
+      color: var(--success);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .answer-text {
+      font-size: 1.05rem;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+
+    .vocabulary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .vocab-pill {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <span class="badge">CEFR B1 Reading</span>
+      <h1 style="font-size: 1.4rem; font-weight: 800; margin-top: 4px;">Interactive Short Stories</h1>
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      Story: <span id="currentNumberText">1</span> / 30
+    </div>
+  </header>
+
+  <div class="controls-row">
+    <button id="prevBtn" title="Previous Story">◀ Prev</button>
+    <select id="storySelect" aria-label="Select Story" style="max-width: 260px; text-overflow: ellipsis;">
+      <!-- Populated by JavaScript -->
+    </select>
+    <button id="nextBtn" title="Next Story">Next ▶</button>
+    <button id="randomBtn" title="Random Story">🎲 Random</button>
+
+    <div class="speed-controls">
+      <span>Speed:</span>
+      <select id="speedSelect">
+        <option value="50">Slow</option>
+        <option value="25" selected>Normal</option>
+        <option value="10">Fast</option>
+      </select>
+      <button id="skipBtn" style="padding: 4px 8px; font-size: 0.8rem;">Show All</button>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="word-counter" id="wordCountLabel">100 words</div>
+    <div class="story-title" id="storyTitle"></div>
+    <span id="storyContent"></span><span class="cursor" id="typeCursor"></span>
+  </div>
+
+  <div class="interactive-section" id="interactiveSection">
+    <div class="question-box">
+      <div class="question-title">Comprehension Question</div>
+      <div class="question-text" id="questionText"></div>
+    </div>
+
+    <div class="timer-container" id="timerContainer">
+      <div class="timer-bar-bg">
+        <div class="timer-bar-fill" id="timerBar"></div>
+      </div>
+      <div class="timer-text">
+        <span>Answer will appear automatically...</span>
+        <span id="timerCountdown">5s</span>
+      </div>
+    </div>
+
+    <div class="answer-box" id="answerBox">
+      <div class="answer-title">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        Correct Answer & Key Evidence
+      </div>
+      <div class="answer-text" id="answerText"></div>
+      <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-top: 10px;">Useful Vocabulary:</div>
+      <div class="vocabulary-tags" id="vocabBox"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const stories = [
+  {
+    id: 1,
+    title: "1. The Lost Wallet",
+    text: "Lucas was walking through the quiet park on Saturday morning when he noticed something shiny under a bench. It was a brown leather wallet. Instead of keeping it, he opened it to look for an ID card. Fortunately, there was a driver's license with an address nearby. Lucas decided to walk straight to the house. When an elderly woman opened the door, her face lit up with joy. She explained that she had lost the wallet two days ago while feeding the birds. She offered Lucas some homemade cookies and thanked him for his honest decision.",
+    words: 100,
+    question: "Why did Lucas decide to go straight to the house instead of taking the wallet to a police station?",
+    answer: "He found a driver's license with an address located nearby inside the wallet, so he chose to return it directly to the elderly owner.",
+    vocab: ["leather", "instead of", "fortunately", "driver's license", "lit up"]
+  },
+  {
+    id: 2,
+    title: "2. The Midnight Train",
+    text: "Elena arrived at the central station completely out of breath. Her watch showed midnight, and the last platform seemed deserted. Suddenly, a conductor appeared and asked where she was traveling. When she explained that she needed to reach Bristol for an interview, he smiled warmly. He told her that the express train was running fifteen minutes behind schedule due to light rain. Elena sat down on the wooden bench, feeling relieved. While she waited, she took out her notes and reviewed her presentation once more. Ten minutes later, the bright lights of the engine finally illuminated the tracks.",
+    words: 100,
+    question: "Why had Elena not missed her train despite arriving at midnight?",
+    answer: "The express train was delayed and running fifteen minutes behind schedule because of light rain.",
+    vocab: ["out of breath", "deserted", "conductor", "behind schedule", "relieved"]
+  },
+  {
+    id: 3,
+    title: "3. The Secret Recipe",
+    text: "Carlos loved helping his grandfather in the small bakery every Sunday. For years, the old man refused to share the secret ingredient in his famous lemon cake. However, on Carlos's eighteenth birthday, his grandfather handed him a yellow notebook filled with handwritten notes. 'You are ready now,' he whispered with a proud smile. Carlos opened the page and discovered that the mystery ingredient was simply a spoonful of fresh ginger and local honey. That afternoon, they baked together side by side, filling the entire neighborhood with an unforgettable citrus aroma that attracted customers from three streets away.",
+    words: 100,
+    question: "What was the grandfather's secret ingredient for his famous lemon cake?",
+    answer: "A spoonful of fresh ginger combined with local honey.",
+    vocab: ["ingredient", "handwritten", "proud", "ginger", "aroma"]
+  },
+  {
+    id: 4,
+    title: "4. The Stray Puppy",
+    text: "While riding her bicycle home from school, Maya heard a soft whimpering sound coming from a cardboard box near the recycling bins. She stopped and peered inside carefully. A tiny black puppy with white paws looked up at her with frightened eyes. Maya wrapped the shivering creature in her jacket and called her mother immediately. Although her parents had previously said they could not afford a pet, they agreed to foster the puppy temporarily. Within two weeks, the playful dog had stolen everyone's heart, and the family unanimously decided to welcome him as a permanent member.",
+    words: 100,
+    question: "What convinced Maya's parents to keep the puppy permanently after initially wanting to foster it?",
+    answer: "Within two weeks, the playful puppy had stolen everyone's heart, leading the family to agree unanimously.",
+    vocab: ["whimpering", "peered", "shivering", "foster", "unanimously"]
+  },
+  {
+    id: 5,
+    title: "5. The Science Fair Surprise",
+    text: "Daniel spent three solid weeks building a solar-powered fan for the annual school science fair. On the morning of the exhibition, dark storm clouds covered the sky, making it impossible to test his invention outdoors. Feeling disappointed, Daniel thought he had lost any chance of winning. However, his classmate Sofia suggested using the strong overhead lamps inside the gym. Daniel connected the miniature solar panel under the halogen bulb, and the blades began spinning smoothly. The judges were so impressed by his quick problem-solving ability that they awarded him second place in the engineering category.",
+    words: 100,
+    question: "How did Daniel overcome the lack of sunlight during the science exhibition?",
+    answer: "He followed Sofia's suggestion and powered the solar panel using the gym's strong overhead halogen lamps.",
+    vocab: ["annual", "exhibition", "disappointed", "overhead", "problem-solving"]
+  },
+  {
+    id: 6,
+    title: "6. The Forgotten Umbrella",
+    text: "Mark was sitting in a crowded café when heavy rain began pouring outside. He noticed an expensive red umbrella resting against the counter. The barista announced that the owner had walked out without it ten minutes earlier. Since Mark was heading toward the subway station, he offered to run after the man in the navy coat. He sprinted two blocks through the wet streets and shouted before the man boarded the bus. The traveler turned around surprised and expressed deep gratitude, explaining that the umbrella was a gift from his late grandfather in Dublin.",
+    words: 100,
+    question: "Why was the red umbrella so special to the man in the navy coat?",
+    answer: "It was a sentimental gift from his late grandfather in Dublin.",
+    vocab: ["barista", "heading toward", "sprinted", "gratitude", "late grandfather"]
+  },
+  {
+    id: 7,
+    title: "7. A New Language",
+    text: "When Sara moved from Madrid to Berlin, ordering breakfast was a daily struggle. She felt embarrassed whenever she mispronounced words at the local bakery. Instead of giving up, she downloaded a language app and made a commitment to learn ten useful phrases every single morning. She practiced greeting neighbors and asking for directions politely. Six months later, Sara was holding casual conversations about weekend plans with her coworkers. Learning German was challenging, but overcoming her initial fear boosted her self-confidence tremendously, proving to herself that consistent daily practice makes even difficult tasks entirely manageable.",
+    words: 100,
+    question: "What strategy helped Sara improve her German speaking skills and confidence?",
+    answer: "She made a commitment to learn ten useful phrases every morning and practiced with neighbors and coworkers.",
+    vocab: ["struggle", "mispronounced", "commitment", "boosted", "manageable"]
+  },
+  {
+    id: 8,
+    title: "8. The Camping Mishap",
+    text: "Tom and his brother set up their green tent near the peaceful riverbank just before sunset. They lit a small campfire and toasted marshmallows under the clear stars. However, around two in the morning, a sudden thunderstorm woke them up with loud thunder. Rain leaked through an unzipped window, soaking their sleeping bags and clothes. Quickly, they packed their essential gear into the car trunk and spent the rest of the night listening to the radio inside the warm vehicle. Despite getting wet, they laughed over breakfast about their dramatic camping adventure.",
+    words: 100,
+    question: "Why did Tom and his brother have to abandon their tent in the middle of the night?",
+    answer: "A sudden thunderstorm hit and rain leaked through an unzipped window, soaking their sleeping bags.",
+    vocab: ["riverbank", "toasted", "thunderstorm", "leaked", "essential gear"]
+  },
+  {
+    id: 9,
+    title: "9. The Antique Compass",
+    text: "While cleaning out her grandmother's dusty attic, Clara discovered a heavy brass compass hidden inside an old wooden chest. Unlike modern digital compasses, this antique instrument had intricate nautical engravings along its rim. Clara took it to a local historian who examined it with a magnifying lens. He informed her that the compass belonged to a merchant vessel that sailed between Liverpool and Boston during the nineteenth century. Clara felt a profound connection to maritime history and decided to preserve the valuable heirloom carefully on her living room bookshelf rather than selling it.",
+    words: 100,
+    question: "What historical origin did the expert uncover about Clara's brass compass?",
+    answer: "It belonged to a 19th-century merchant vessel that sailed between Liverpool and Boston.",
+    vocab: ["attic", "intricate", "magnifying lens", "merchant vessel", "heirloom"]
+  },
+  {
+    id: 10,
+    title: "10. The Community Garden",
+    text: "The vacant lot behind the library had been filled with rubbish for years. Last spring, Mr. Davis organized a volunteer neighborhood committee to transform the dirty space into a community vegetable garden. Neighbors contributed shovels, rich soil, and vegetable seeds. Young children watered the tomato plants while older residents weeded the flowerbeds each weekend. By midsummer, the garden was producing crisp lettuce, sweet carrots, and fragrant herbs. The project not only beautified the neglected neighborhood street but also brought diverse families together, creating friendships that continued long after the final autumn harvest.",
+    words: 100,
+    question: "How did the community garden project impact the local neighborhood?",
+    answer: "It cleaned up a neglected vacant lot, produced fresh vegetables, and created strong friendships among neighbors.",
+    vocab: ["vacant lot", "committee", "weeded", "neglected", "harvest"]
+  },
+  {
+    id: 11,
+    title: "11. The Bicycle Race",
+    text: "Julian spent months preparing for the annual mountain bike race through the pine forest. On race day, the trail was slippery from morning rain. During the second lap, his main competitor fell after hitting a hidden tree root. Julian could have sped ahead to guarantee first place, but he stopped his bike immediately to check on the injured rider. Together, they repaired the slipped chain and crossed the finish line side by side. Although Julian finished fourth overall, he received the fair-play sportsmanship trophy, which meant far more to him than any gold medal.",
+    words: 100,
+    question: "Why did Julian choose not to overtake his competitor during the race?",
+    answer: "He stopped to check on the injured competitor and helped him repair a slipped chain.",
+    vocab: ["slippery", "lap", "competitor", "sped ahead", "sportsmanship"]
+  },
+  {
+    id: 12,
+    title: "12. The Flight Delay",
+    text: "Liam was waiting at gate 14 for his flight to Toronto when an announcement informed passengers of a four-hour mechanical delay. Instead of complaining to the airline staff, Liam took out his sketchbook and drew charcoal portraits of fellow travelers sitting nearby. An elderly couple noticed his artwork and struck up a pleasant conversation about their travel memories across Canada. The husband was a retired landscape painter who offered Liam valuable drawing advice. When boarding was finally announced, Liam felt grateful for the unexpected delay, having gained both valuable tips and an inspiring new friendship.",
+    words: 100,
+    question: "How did Liam make productive use of his four-hour flight delay at the airport?",
+    answer: "He sketched portraits of passengers and had an insightful conversation with a retired painter.",
+    vocab: ["mechanical delay", "sketchbook", "charcoal", "struck up", "landscape"]
+  },
+  {
+    id: 13,
+    title: "13. The Missing Keys",
+    text: "Hannah was running late for a crucial job interview when she realized her apartment keys were missing. She checked her coat pockets, searched under the sofa cushions, and emptied her handbag twice. Frustrated and anxious, she paused, took a deep breath, and retraced her morning steps methodically. She remembered carrying a bag of groceries into the kitchen upon returning from the corner store. Sure enough, the keys were resting quietly beside the fruit bowl on the kitchen island. She grabbed them, caught the subway just in time, and successfully arrived five minutes before her appointment.",
+    words: 100,
+    question: "Where did Hannah finally locate her missing apartment keys?",
+    answer: "Beside the fruit bowl on her kitchen island, where she had left them after grocery shopping.",
+    vocab: ["crucial", "anxious", "retraced", "methodically", "just in time"]
+  },
+  {
+    id: 14,
+    title: "14. A Taste of Italy",
+    text: "Marco wanted to prepare an authentic Italian dinner for his parents' wedding anniversary. He spent the entire morning shopping at the specialty market for fresh basil, ripe tomatoes, and imported parmesan cheese. Following an old Tuscan recipe, he carefully kneaded the pasta dough until it was smooth and elastic. Although the kitchen was covered in white flour, the resulting tagliatelle with homemade pesto sauce was extraordinary. His parents took their first bite and smiled, recalling their honeymoon in Florence thirty years ago. Marco felt immense satisfaction knowing his culinary effort had created such happiness.",
+    words: 100,
+    question: "What memory did Marco's homemade dinner bring back for his parents?",
+    answer: "It reminded them of their romantic honeymoon in Florence thirty years earlier.",
+    vocab: ["authentic", "specialty market", "kneaded", "elastic", "culinary"]
+  },
+  {
+    id: 15,
+    title: "15. The Bookstore Mystery",
+    text: "Oliver loved browsing through the second-hand bookstore down Elm Street. One afternoon, between the yellowed pages of a classic poetry collection, he discovered an old black-and-white photograph dated 1952. On the back, a message read: 'Meet me by the harbor lighthouse, always.' Oliver showed the photograph to the shop owner, who recognized the young woman as the town's former librarian. Oliver visited the local archives to return the photo to her surviving daughter. The daughter wept with joy, having never seen a picture of her mother at that young age before.",
+    words: 100,
+    question: "Who did the mysterious 1952 photograph in the poetry book belong to?",
+    answer: "The town's former librarian, whose surviving daughter Oliver found through the archives.",
+    vocab: ["browsing", "second-hand", "harbor", "archives", "surviving"]
+  },
+  {
+    id: 16,
+    title: "16. The First Marathon",
+    text: "Running twenty-six miles had always seemed like an impossible challenge for Chloe. Six months before the marathon, she could barely complete three miles without stopping to catch her breath. However, she followed a rigorous training schedule, running through rain, cold mornings, and sore muscles. At mile twenty-two, her legs burned intensely and she considered quitting. Suddenly, she spotted her friends holding a colourful banner with her name. Encouraged by their cheers, Chloe pushed through the exhaustion and crossed the finish line with tears of triumph, achieving a goal she once thought completely unreachable.",
+    words: 100,
+    question: "What motivated Chloe to push through exhaustion during mile twenty-two of the race?",
+    answer: "She saw her friends cheering and holding a colorful banner with her name.",
+    vocab: ["rigorous", "sore", "exhaustion", "triumph", "unreachable"]
+  },
+  {
+    id: 17,
+    title: "17. The Broken Violin",
+    text: "Leo was practicing for his youth orchestra audition when he accidentally dropped his violin onto the tiled floor. The wooden bridge cracked in half, producing a horrible snapping noise. Devastated, Leo thought his audition was ruined because the repair would take several days. Fortunately, an elderly luthier in town offered to inspect the instrument. The craftsman worked tirelessly for three hours, replacing the bridge and adjusting the pegs with expert skill. Not only did the violin sound better than before, but Leo also passed his audition with distinction the following afternoon.",
+    words: 100,
+    question: "How was Leo able to perform in his audition despite dropping his violin?",
+    answer: "A skilled local luthier repaired the instrument in three hours by replacing the broken bridge and pegs.",
+    vocab: ["orchestra", "audition", "snapping", "luthier", "craftsman"]
+  },
+  {
+    id: 18,
+    title: "18. The Power Outage",
+    text: "A severe winter blizzard knocked out electricity across the entire neighborhood on a freezing Friday night. With no internet connection or television, the Miller family gathered around the fireplace in the living room. Mrs. Miller lit several candles while Mr. Miller brought out an old acoustic guitar from the basement. They sang classic folk songs, played board games, and shared childhood stories they had never told before. What initially seemed like an annoying inconvenience turned into one of the warmest and most memorable family evenings they had experienced in many years.",
+    words: 100,
+    question: "How did the Miller family spend their evening without electricity or internet?",
+    answer: "They gathered by the fireplace, lit candles, played acoustic guitar, and shared board games and childhood stories.",
+    vocab: ["blizzard", "knocked out", "power outage", "acoustic", "inconvenience"]
+  },
+  {
+    id: 19,
+    title: "19. The Mountain Hike",
+    text: "Emma and her guide set off before dawn to hike Mount Washington. The initial path wound through dense green forests, but soon the trees gave way to steep, rocky terrain. As they approached the summit, a thick fog rolled in, reducing visibility to just a few meters. Emma felt uneasy, but her experienced guide instructed her to follow the red trail markers closely. After an hour of careful climbing, they reached the peak. The wind suddenly blew the fog away, revealing a panoramic view of endless valleys bathed in golden morning sunshine.",
+    words: 100,
+    question: "What difficulty did Emma and her guide encounter as they approached the mountain summit?",
+    answer: "A thick fog rolled in, drastically reducing visibility to just a few meters on the rocky terrain.",
+    vocab: ["set off", "terrain", "summit", "visibility", "panoramic"]
+  },
+  {
+    id: 20,
+    title: "20. The Ceramic Bowl",
+    text: "In her first pottery class, Nora struggled to center the wet clay on the spinning wheel. Her first three attempts collapsed into messy gray lumps. Frustrated, she wanted to clean her hands and leave the workshop. The instructor reminded her that pottery requires patience and gentle pressure rather than force. Taking a steady breath, Nora tried once more, relaxing her shoulders. Gradually, the clay rose between her fingers, forming a neat, symmetrical bowl. When it was fired and glazed two weeks later, she proudly displayed it on her dining table as proof of perseverance.",
+    words: 100,
+    question: "What advice from the pottery instructor helped Nora successfully shape her clay bowl?",
+    answer: "The instructor told her that pottery requires patience and gentle pressure rather than force.",
+    vocab: ["pottery", "spinning wheel", "collapsed", "symmetrical", "perseverance"]
+  },
+  {
+    id: 21,
+    title: "21. The Old Greenhouse",
+    text: "When Sam moved into his countryside cottage, the glass greenhouse in the backyard was overgrown with thorny weeds and broken panes. Instead of tearing it down, he dedicated his weekends to restoring it. He replaced cracked glass, painted the iron frame, and installed wooden shelves. By April, the restored greenhouse was filled with seedlings of bell peppers, cucumbers, and fragrant orchids. The warm greenhouse became Sam's favourite sanctuary, where he enjoyed drinking tea and reading books while listening to raindrops tapping gently against the transparent glass roof above.",
+    words: 100,
+    question: "What did Sam do with the overgrown and broken greenhouse in his backyard?",
+    answer: "He restored it by replacing glass panes, painting the frame, and planting seedlings and flowers.",
+    vocab: ["greenhouse", "overgrown", "panes", "restoring", "sanctuary"]
+  },
+  {
+    id: 22,
+    title: "22. The Wildlife Photographer",
+    text: "Arthur had been waiting inside a wooden camouflage blind for six freezing hours in the Scottish Highlands. His goal was to photograph the elusive golden eagle. His fingers were stiff with cold, and his camera battery was running low. Just as he considered packing his equipment, a massive eagle landed gracefully on a granite cliff fifty meters away. Arthur held his breath, adjusted the focal length silently, and snapped several crisp photographs before the bird launched back into the blue sky. The breathtaking images were published on the cover of a national nature magazine.",
+    words: 100,
+    question: "What challenge did Arthur face while waiting to photograph the golden eagle?",
+    answer: "He waited six hours in freezing cold with stiff fingers and a nearly depleted camera battery.",
+    vocab: ["camouflage", "elusive", "stiff", "granite", "breathtaking"]
+  },
+  {
+    id: 23,
+    title: "23. The Street Musician",
+    text: "Every Friday afternoon, an elderly man named Gabriel played his wooden cello near the entrance of the metro station. Most commuters rushed past him without paying attention, busy checking their phones. One rainy evening, a young boy stopped in his tracks, completely captivated by the classical melody. His mother waited patiently while Gabriel finished the Bach piece. The boy enthusiastically clapped his hands and dropped a two-pound coin into the open instrument case. Gabriel tipped his woolen hat with a warm smile, knowing that reaching even one attentive listener made his performance worthwhile.",
+    words: 100,
+    question: "What reaction did Gabriel receive from the young boy at the metro station?",
+    answer: "The boy stopped, listened attentively to the melody, clapped enthusiastically, and dropped a coin.",
+    vocab: ["commuters", "captivated", "melody", "attentive", "worthwhile"]
+  },
+  {
+    id: 24,
+    title: "24. The Chess Tournament",
+    text: "Fourteen-year-old Lucas sat across the chessboard from the defending club champion, a man twice his age. Lucas felt intimidated during the opening moves as his opponent played with aggressive speed. However, Lucas remembered his coach's advice: control the center and never rush your decisions. He took his time to calculate multiple defensive variations. On the thirty-fifth move, his opponent made an overconfident tactical error by advancing his queen too early. Lucas spotted the weakness, sacrificed a bishop, and achieved an unexpected checkmate, earning the respect of everyone in the tournament hall.",
+    words: 100,
+    question: "What tactical mistake did the defending champion make against Lucas?",
+    answer: "He made an overconfident error by advancing his queen too early, which allowed Lucas to counterattack.",
+    vocab: ["opponent", "intimidated", "tactical", "sacrificed", "checkmate"]
+  },
+  {
+    id: 25,
+    title: "25. The Rescued Dolphin",
+    text: "While walking along the sandy beach at dawn, two marine biology students spotted a young dolphin stranded in shallow water near the sandbar. The tide was receding rapidly, leaving the animal unable to swim back to open sea. Without panicking, the students wet their towels to keep the dolphin's skin hydrated and immediately contacted the local marine rescue hotline. Within thirty minutes, wildlife specialists arrived with stretchers. Together, they gently guided the dolphin into deeper water. The animal swam in a joyous circle, leaped through the waves, and rejoined its pod waiting offshore.",
+    words: 100,
+    question: "What immediate action did the students take to protect the stranded dolphin?",
+    answer: "They covered its skin with wet towels to keep it hydrated and called the marine rescue hotline.",
+    vocab: ["stranded", "receding", "hydrated", "stretchers", "pod"]
+  },
+  {
+    id: 26,
+    title: "26. The Coding Bug",
+    text: "Liam had been working on his web application for five consecutive hours when the login form stopped working entirely. The browser displayed a frustrating error message every time he submitted information. After checking fifty lines of code without finding any syntax mistakes, he felt completely exhausted. He decided to step away from his desk and walk around the block in the fresh evening air. When he returned with a clear mind, he spotted the mistake instantly: a simple missing bracket in the database query. Fixing that single character resolved the entire problem immediately.",
+    words: 100,
+    question: "How did Liam solve the frustrating bug in his web application code?",
+    answer: "He took a walk to clear his mind and returned to easily spot a single missing bracket in his query.",
+    vocab: ["consecutive", "syntax", "exhausted", "bracket", "resolved"]
+  },
+  {
+    id: 27,
+    title: "27. The Island Ferry",
+    text: "The wooden ferry traveled twice a day between the coastal fishing village and the rocky island. Captain George had navigated the route for over forty years, recognizing every reef and lighthouse along the shoreline. One foggy afternoon, the vessel's radar malfunctioned unexpectedly. While passengers appeared nervous, Captain George calmly steered the ferry relying on the rhythmic sound of the bell buoys and his deep geographical memory. Forty-five minutes later, the ferry docked smoothly at the island harbor. The relieved passengers applauded the veteran captain for his remarkable navigation skills and calm demeanor.",
+    words: 100,
+    question: "How did Captain George navigate the ferry through dense fog after the radar failed?",
+    answer: "He relied on the acoustic sound of bell buoys and his four decades of geographical experience.",
+    vocab: ["ferry", "shoreline", "malfunctioned", "buoys", "demeanor"]
+  },
+  {
+    id: 28,
+    title: "28. The Rooftop Garden",
+    text: "Living on the sixth floor of a downtown apartment, Isabella missed having a green space to relax. With the building manager's permission, she started placing ceramic pots and wooden planters on the unused flat roof. Within months, she had cultivated juicy strawberries, colorful petunias, and aromatic lavender. Other tenants soon joined the initiative, adding outdoor furniture and fairy lights. The rooftop became a peaceful urban oasis where neighbors gathered at twilight to watch city sunsets and escape the noisy traffic below, proving that nature can flourish even in the heart of concrete cities.",
+    words: 100,
+    question: "What did Isabella's rooftop gardening project turn into for the apartment building?",
+    answer: "It became a community oasis where tenants gathered to relax, enjoy sunset views, and escape city noise.",
+    vocab: ["cultivated", "initiative", "oasis", "twilight", "flourish"]
+  },
+  {
+    id: 29,
+    title: "29. The Stolen Painting",
+    text: "Detective Vance examined the empty golden frame hanging on the gallery wall. The nineteenth-century landscape painting had vanished overnight without triggering any motion alarms. Vance noticed a small smudge of white grease near the display window lock. He deduced that the thief had entered through the skylight rather than the guarded front doors. By cross-referencing security camera footage from the adjacent parking garage, he identified a suspicious delivery van. Within forty-eight hours, the police recovered the unharmed masterpiece hidden in an abandoned warehouse, returning it to the museum before the international exhibition began.",
+    words: 100,
+    question: "What clue helped Detective Vance determine how the thief entered the art gallery?",
+    answer: "A smudge of white grease near the display lock revealed the thief entered through the skylight.",
+    vocab: ["vanished", "smudge", "deduced", "cross-referencing", "masterpiece"]
+  },
+  {
+    id: 30,
+    title: "30. The Solar Eclipse",
+    text: "Hundreds of astronomy enthusiasts gathered on the open hilltop wearing special protective glasses to witness the rare solar eclipse. As the moon slowly slid across the bright disc of the sun, the temperature dropped noticeably and birds stopped singing in the nearby trees. A strange twilight cast silver shadows across the grass. During the two minutes of total darkness, the glowing solar corona appeared like a diamond ring in the dark sky. The crowd gasped in awe at the celestial spectacle. When sunlight returned, everyone burst into spontaneous applause, deeply moved by the cosmic event.",
+    words: 100,
+    question: "What natural changes occurred when the moon covered the sun during the eclipse?",
+    answer: "The temperature dropped noticeably, birds stopped singing, and twilight cast silver shadows.",
+    vocab: ["enthusiasts", "witness", "corona", "gasped in awe", "celestial"]
+  }
+];
+
+// Audio Synthesizer using Web Audio API (Native, no external files)
+class SoundFX {
+  constructor() {
+    this.ctx = null;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) this.ctx = new AudioContext();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+  playKey() {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600 + Math.random() * 250, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.04);
+    } catch(e) {}
+  }
+  playReveal() {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.25);
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+}
+
+const sfx = new SoundFX();
+
+// DOM elements
+const storySelect = document.getElementById('storySelect');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const randomBtn = document.getElementById('randomBtn');
+const speedSelect = document.getElementById('speedSelect');
+const skipBtn = document.getElementById('skipBtn');
+const storyTitleEl = document.getElementById('storyTitle');
+const storyContentEl = document.getElementById('storyContent');
+const typeCursor = document.getElementById('typeCursor');
+const currentNumberText = document.getElementById('currentNumberText');
+const wordCountLabel = document.getElementById('wordCountLabel');
+
+const interactiveSection = document.getElementById('interactiveSection');
+const questionTextEl = document.getElementById('questionText');
+const timerContainer = document.getElementById('timerContainer');
+const timerBar = document.getElementById('timerBar');
+const timerCountdown = document.getElementById('timerCountdown');
+const answerBox = document.getElementById('answerBox');
+const answerTextEl = document.getElementById('answerText');
+const vocabBox = document.getElementById('vocabBox');
+
+let currentStoryIndex = 0;
+let typewriterTimeout = null;
+let countdownInterval = null;
+let isTyping = false;
+
+// Populate dropdown selector
+stories.forEach((s, idx) => {
+  const opt = document.createElement('option');
+  opt.value = idx;
+  opt.textContent = s.title;
+  storySelect.appendChild(opt);
+});
+
+function loadStory(index) {
+  clearTimeout(typewriterTimeout);
+  clearInterval(countdownInterval);
+
+  currentStoryIndex = index;
+  storySelect.value = index;
+  currentNumberText.textContent = index + 1;
+
+  const story = stories[index];
+  storyTitleEl.textContent = story.title;
+  storyContentEl.textContent = '';
+  typeCursor.classList.remove('hidden');
+
+  interactiveSection.style.display = 'none';
+  answerBox.style.display = 'none';
+  timerContainer.style.display = 'block';
+
+  // Count exact words
+  const count = story.text.trim().split(/\s+/).length;
+  wordCountLabel.textContent = `${count} words`;
+
+  // Start Typewriter effect
+  isTyping = true;
+  let charIdx = 0;
+  const fullText = story.text;
+
+  function typeChar() {
+    if (!isTyping) return;
+    const speed = parseInt(speedSelect.value, 10);
+
+    if (charIdx < fullText.length) {
+      storyContentEl.textContent += fullText.charAt(charIdx);
+      if (charIdx % 3 === 0 && fullText.charAt(charIdx) !== ' ') {
+        sfx.playKey();
+      }
+      charIdx++;
+      typewriterTimeout = setTimeout(typeChar, speed);
+    } else {
+      finishTyping();
+    }
+  }
+
+  typeChar();
+}
+
+function finishTyping() {
+  clearTimeout(typewriterTimeout);
+  isTyping = false;
+  storyContentEl.textContent = stories[currentStoryIndex].text;
+  typeCursor.classList.add('hidden');
+  startQuestionCountdown();
+}
+
+function startQuestionCountdown() {
+  const story = stories[currentStoryIndex];
+  questionTextEl.textContent = story.question;
+  interactiveSection.style.display = 'block';
+  interactiveSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // 5 seconds timer
+  let remainingSeconds = 5;
+  timerCountdown.textContent = `${remainingSeconds}s`;
+  timerBar.style.transition = 'none';
+  timerBar.style.width = '100%';
+
+  setTimeout(() => {
+    timerBar.style.transition = 'width 5s linear';
+    timerBar.style.width = '0%';
+  }, 50);
+
+  countdownInterval = setInterval(() => {
+    remainingSeconds--;
+    if (remainingSeconds > 0) {
+      timerCountdown.textContent = `${remainingSeconds}s`;
+    } else {
+      clearInterval(countdownInterval);
+      showAnswer();
+    }
+  }, 1000);
+}
+
+function showAnswer() {
+  clearInterval(countdownInterval);
+  timerContainer.style.display = 'none';
+  sfx.playReveal();
+
+  const story = stories[currentStoryIndex];
+  answerTextEl.textContent = story.answer;
+
+  vocabBox.innerHTML = '';
+  story.vocab.forEach(v => {
+    const pill = document.createElement('span');
+    pill.className = 'vocab-pill';
+    pill.textContent = v;
+    vocabBox.appendChild(pill);
+  });
+
+  answerBox.style.display = 'block';
+}
+
+// Event Listeners
+storySelect.addEventListener('change', (e) => {
+  sfx.init();
+  loadStory(parseInt(e.target.value, 10));
+});
+
+prevBtn.addEventListener('click', () => {
+  sfx.init();
+  const nextIdx = (currentStoryIndex - 1 + stories.length) % stories.length;
+  loadStory(nextIdx);
+});
+
+nextBtn.addEventListener('click', () => {
+  sfx.init();
+  const nextIdx = (currentStoryIndex + 1) % stories.length;
+  loadStory(nextIdx);
+});
+
+randomBtn.addEventListener('click', () => {
+  sfx.init();
+  let r = Math.floor(Math.random() * stories.length);
+  if (r === currentStoryIndex) r = (r + 1) % stories.length;
+  loadStory(r);
+});
+
+skipBtn.addEventListener('click', () => {
+  sfx.init();
+  if (isTyping) finishTyping();
+});
+
+document.addEventListener('click', () => sfx.init(), { once: true });
+
+// Initial load
+loadStory(0);
+</script>
+</body>
+</html>
